@@ -460,12 +460,43 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
         }
 
-        .portfolio-modal-content img {
+        .portfolio-modal-media {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .portfolio-modal-media img {
             width: 100%;
             max-height: 80vh;
             object-fit: contain;
             display: block;
             border-radius: 12px;
+            transition: transform 0.25s ease;
+            cursor: zoom-in;
+        }
+
+        .portfolio-modal-media img.zoomed {
+            transform: scale(1.8);
+            cursor: zoom-out;
+        }
+
+        .portfolio-modal-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .portfolio-modal-toolbar button {
+            border: none;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #050a0e;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         .portfolio-modal-close {
@@ -768,7 +799,7 @@
                         <h3>Uri Essentials</h3>
                         <p class="text-green">Skincare E-Commerce</p>
                     </div>
-                    <button class="arrow-icon" type="button" data-image="images/Uri jpg.png" aria-label="Open Uri Essentials preview">
+                    <button class="arrow-icon" type="button" data-image="images/Uri jpg.png" data-secondary-image="images/Uri 2.png" aria-label="Open Uri Essentials preview">
                         <img src="images/arrow 2.png" alt="Open project preview" width="20">
                     </button>
                 </div>
@@ -856,7 +887,13 @@
     <div class="portfolio-modal" id="portfolioModal" aria-hidden="true">
         <div class="portfolio-modal-content">
             <button class="portfolio-modal-close" id="portfolioModalClose" type="button" aria-label="Close preview">&times;</button>
-            <img id="portfolioModalImage" src="" alt="Portfolio preview">
+            <div class="portfolio-modal-media">
+                <img id="portfolioModalImage" src="" alt="Portfolio preview">
+            </div>
+            <div class="portfolio-modal-toolbar">
+                <button id="portfolioZoomToggle" type="button">Zoom</button>
+                <button id="portfolioSwitchImage" type="button">View second image</button>
+            </div>
         </div>
     </div>
 
@@ -864,23 +901,51 @@
         const portfolioModal = document.getElementById('portfolioModal');
         const portfolioModalImage = document.getElementById('portfolioModalImage');
         const portfolioModalClose = document.getElementById('portfolioModalClose');
+        const portfolioZoomToggle = document.getElementById('portfolioZoomToggle');
+        const portfolioSwitchImage = document.getElementById('portfolioSwitchImage');
+        let activeImageIndex = 0;
+        let activeImages = [];
 
         function closePortfolioModal() {
             portfolioModal.classList.remove('active');
             portfolioModal.setAttribute('aria-hidden', 'true');
             portfolioModalImage.removeAttribute('src');
+            portfolioModalImage.classList.remove('zoomed');
+            activeImages = [];
+            activeImageIndex = 0;
+        }
+
+        function updatePortfolioImage() {
+            if (!activeImages.length) return;
+            portfolioModalImage.src = activeImages[activeImageIndex];
+            portfolioModalImage.classList.remove('zoomed');
+            portfolioSwitchImage.textContent = activeImageIndex === 0 ? 'View second image' : 'View first image';
         }
 
         document.querySelectorAll('.arrow-icon').forEach((button) => {
             button.addEventListener('click', () => {
-                const imagePath = button.getAttribute('data-image');
-                if (!imagePath) return;
+                const primaryImage = button.getAttribute('data-image');
+                const secondaryImage = button.getAttribute('data-secondary-image');
+                activeImages = secondaryImage ? [primaryImage, secondaryImage] : [primaryImage];
+                activeImageIndex = 0;
 
-                portfolioModalImage.src = imagePath;
+                if (!primaryImage) return;
+
                 portfolioModalImage.alt = button.closest('.portfolio-card')?.querySelector('h3')?.textContent || 'Portfolio preview';
                 portfolioModal.classList.add('active');
                 portfolioModal.setAttribute('aria-hidden', 'false');
+                updatePortfolioImage();
             });
+        });
+
+        portfolioZoomToggle.addEventListener('click', () => {
+            portfolioModalImage.classList.toggle('zoomed');
+        });
+
+        portfolioSwitchImage.addEventListener('click', () => {
+            if (activeImages.length < 2) return;
+            activeImageIndex = activeImageIndex === 0 ? 1 : 0;
+            updatePortfolioImage();
         });
 
         portfolioModalClose.addEventListener('click', closePortfolioModal);
@@ -889,6 +954,10 @@
             if (event.target === portfolioModal) {
                 closePortfolioModal();
             }
+        });
+
+        portfolioModalImage.addEventListener('click', () => {
+            portfolioModalImage.classList.toggle('zoomed');
         });
 
         document.addEventListener('keydown', (event) => {
