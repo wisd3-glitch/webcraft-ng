@@ -430,6 +430,56 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .portfolio-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 10, 14, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 2000;
+        }
+
+        .portfolio-modal.active {
+            display: flex;
+        }
+
+        .portfolio-modal-content {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .portfolio-modal-content img {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+            border-radius: 12px;
+        }
+
+        .portfolio-modal-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(5, 10, 14, 0.8);
+            color: #ffffff;
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
         .portfolio-cta {
@@ -692,7 +742,9 @@
                         <h3>Royal Properties</h3>
                         <p class="text-green">Real Estate Brokerage</p>
                     </div>
-                    <div class="arrow-icon"><img src="images/arrow 2.png" alt="decorative arrow indicating link to project details" width="20"></div>
+                    <button class="arrow-icon" type="button" data-image="images/royal jpg.png" aria-label="Open Royal Properties preview">
+                        <img src="images/arrow 2.png" alt="Open project preview" width="20">
+                    </button>
                 </div>
             </div>
             <!-- Project 2: PrimeCare Clinic -->
@@ -703,7 +755,9 @@
                         <h3>PrimeCare Clinic</h3>
                         <p class="text-green">Healthcare Portal</p>
                     </div>
-                    <div class="arrow-icon"><img src="images/arrow 2.png" alt="decorative arrow indicating link to project details" width="20"></div>
+                    <button class="arrow-icon" type="button" data-image="images/PrimeCare jpg.png" aria-label="Open PrimeCare Clinic preview">
+                        <img src="images/arrow 2.png" alt="Open project preview" width="20">
+                    </button>
                 </div>
             </div>
             <!-- Project 3: Uri Essentials -->
@@ -714,7 +768,9 @@
                         <h3>Uri Essentials</h3>
                         <p class="text-green">Skincare E-Commerce</p>
                     </div>
-                    <div class="arrow-icon"><img src="images/arrow 2.png" alt="A descriptive description of the image" width="20"></div>
+                    <button class="arrow-icon" type="button" data-image="images/Uri jpg.png" aria-label="Open Uri Essentials preview">
+                        <img src="images/arrow 2.png" alt="Open project preview" width="20">
+                    </button>
                 </div>
             </div>
             <!-- Project 4: Auron Fly -->
@@ -725,7 +781,9 @@
                         <h3>Auron Fly</h3>
                         <p class="text-green">Private Aviation Brokerage</p>
                     </div>
-                    <div class="arrow-icon"><img src="images/arrow 2.png" alt="A descriptive description of the image" width="20"></div>
+                    <button class="arrow-icon" type="button" data-image="images/Auron jpg.jpg" aria-label="Open Auron Fly preview">
+                        <img src="images/arrow 2.png" alt="Open project preview" width="20">
+                    </button>
                 </div>
             </div>
         </div>
@@ -794,6 +852,51 @@
             &copy; 2026 Webcraft NG. All rights reserved.
         </div>
     </footer>
+
+    <div class="portfolio-modal" id="portfolioModal" aria-hidden="true">
+        <div class="portfolio-modal-content">
+            <button class="portfolio-modal-close" id="portfolioModalClose" type="button" aria-label="Close preview">&times;</button>
+            <img id="portfolioModalImage" src="" alt="Portfolio preview">
+        </div>
+    </div>
+
+    <script>
+        const portfolioModal = document.getElementById('portfolioModal');
+        const portfolioModalImage = document.getElementById('portfolioModalImage');
+        const portfolioModalClose = document.getElementById('portfolioModalClose');
+
+        function closePortfolioModal() {
+            portfolioModal.classList.remove('active');
+            portfolioModal.setAttribute('aria-hidden', 'true');
+            portfolioModalImage.removeAttribute('src');
+        }
+
+        document.querySelectorAll('.arrow-icon').forEach((button) => {
+            button.addEventListener('click', () => {
+                const imagePath = button.getAttribute('data-image');
+                if (!imagePath) return;
+
+                portfolioModalImage.src = imagePath;
+                portfolioModalImage.alt = button.closest('.portfolio-card')?.querySelector('h3')?.textContent || 'Portfolio preview';
+                portfolioModal.classList.add('active');
+                portfolioModal.setAttribute('aria-hidden', 'false');
+            });
+        });
+
+        portfolioModalClose.addEventListener('click', closePortfolioModal);
+
+        portfolioModal.addEventListener('click', (event) => {
+            if (event.target === portfolioModal) {
+                closePortfolioModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closePortfolioModal();
+            }
+        });
+    </script>
 
 </body>
 </html>
